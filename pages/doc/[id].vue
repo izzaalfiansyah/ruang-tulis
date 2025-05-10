@@ -5,6 +5,7 @@ import { DocumentRepository } from "~/repository/document.repository";
 
 const params = useRoute().params;
 const document = ref<Document>();
+const content = ref<string>("");
 const isLoading = ref<boolean>(false);
 const errorException = ref<Failure | null>();
 
@@ -17,9 +18,8 @@ async function getDocument() {
     errorException.value = result;
   }
 
-  console.log(result);
-
   document.value = result as Document;
+  content.value = document.value.content;
 
   isLoading.value = false;
 }
@@ -64,7 +64,7 @@ onMounted(() => {
         </template>
       </div>
       <div class="mt-10 pt-10 border-t">
-        <div class="document-content" v-html="document.content"></div>
+        <Editor v-model="content" :editable="true"></Editor>
       </div>
     </div>
   </template>

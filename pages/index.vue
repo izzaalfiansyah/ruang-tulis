@@ -11,8 +11,6 @@ async function getDocuments() {
   isLoading.value = true;
   const result = await DocumentRepository.get();
 
-  console.log(result);
-
   if (result instanceof Failure) {
     errorException.value = result;
   }
