@@ -1,4 +1,4 @@
-import type { Theme } from "~/@types/theme.type";
+import type { Theme } from "~/entities/theme.type";
 
 export const useTheme = defineStore("theme", {
   state: () => {

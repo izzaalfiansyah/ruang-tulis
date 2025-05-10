@@ -1,6 +1,6 @@
 <template>
   <div
-    class="mt-30 main-container flex items-center justify-between md:flex-row flex-col"
+    class="mt-30 main-container flex items-center justify-between md:flex-row flex-col mb-10"
   >
     <div>
       &copy; 2025
