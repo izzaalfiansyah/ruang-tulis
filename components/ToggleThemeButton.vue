@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { CpuChipIcon, MoonIcon, SunIcon } from "@heroicons/vue/24/outline";
 import type { ThemeData } from "~/entities/theme.type";
-import { useTheme } from "~/store/useTheme";
+import { themeStore } from "~/store/theme.store";
 
-const theme = useTheme();
+const theme = themeStore();
 
 const themes: ThemeData[] = [
   {

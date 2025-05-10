@@ -3,9 +3,9 @@
 </style>
 
 <script lang="ts" setup>
-import { useTheme } from "./store/useTheme";
+import { themeStore } from "./store/theme.store";
 
-const theme = useTheme();
+const theme = themeStore();
 
 onMounted(() => {
   theme.init();

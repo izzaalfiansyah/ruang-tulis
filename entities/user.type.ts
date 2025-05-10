@@ -1,6 +1,7 @@
 import type { DocumentData, DocumentSnapshot } from "firebase/firestore";
 
 export class User {
+  id: any;
   email: string;
   name: string;
   phone: string;
@@ -11,7 +12,8 @@ export class User {
     const data = doc.data()!;
 
     return {
-      email: doc.id,
+      id: doc.id,
+      email: data.email,
       name: data.name,
       phone: data.phone,
       verified: data.verified ?? false,

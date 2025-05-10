@@ -1,6 +1,6 @@
 import type { Theme } from "~/entities/theme.type";
 
-export const useTheme = defineStore("theme", {
+export const themeStore = defineStore("theme", {
   state: () => {
     let theme = localStorage.getItem("theme");
     const media = window.matchMedia("(prefers-color-scheme: dark)");

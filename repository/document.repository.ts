@@ -52,7 +52,6 @@ export class DocumentRepository {
       const author = await getDoc(
         result.data().author as DocumentReference<DocumentData>
       );
-      console.log(author);
 
       if (!author.exists()) {
         throw "Author tidak ditemukan";

@@ -6,6 +6,7 @@ import {
   ArrowTurnDownLeftIcon,
   ArrowTurnDownRightIcon,
   BoldIcon,
+  CodeBracketIcon,
   FlagIcon,
   H1Icon,
   H2Icon,
@@ -63,12 +64,12 @@ const colors: {
   { color: "#00ff00", name: "Hijau" },
   { color: "#0000ff", name: "Biru" },
   { color: "#4b0082", name: "Ungu" },
-  { color: "#ee82ee", name: "Lila" },
+  { color: "#ee82ee", name: "Pink" },
 ];
 </script>
 
 <template>
-  <tempate v-if="editor">
+  <tempate v-if="editor && editable">
     <div class="flex items-center justify-end mb-5">
       <div class="inline-flex items-center space-x-2">
         <EditorToggleButton
@@ -214,11 +215,6 @@ const colors: {
           @click="editor.chain().focus().toggleHeading({ level: 3 }).run()"
         />
         <EditorToggleButton
-          :icon="WindowIcon"
-          :is-active="editor.isActive('blockquote')"
-          @click="editor.chain().focus().toggleBlockquote().run()"
-        />
-        <EditorToggleButton
           :icon="ListBulletIcon"
           :is-active="editor.isActive('bulletList')"
           @click="editor.chain().focus().toggleBulletList().run()"
@@ -227,6 +223,16 @@ const colors: {
           :icon="NumberedListIcon"
           :is-active="editor.isActive('orderedList')"
           @click="editor.chain().focus().toggleOrderedList().run()"
+        />
+        <EditorToggleButton
+          :icon="WindowIcon"
+          :is-active="editor.isActive('blockquote')"
+          @click="editor.chain().focus().toggleBlockquote().run()"
+        />
+        <EditorToggleButton
+          :icon="CodeBracketIcon"
+          :is-active="editor.isActive('code')"
+          @click="editor.chain().focus().toggleCodeBlock().run()"
         />
       </div>
     </FloatingMenu>

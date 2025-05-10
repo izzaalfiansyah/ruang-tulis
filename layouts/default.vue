@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen antialiased text-base font-normal">
     <div class="border-b">
-      <div class="main-container d-flex items-center justify-between py-3">
+      <div class="lg:px-10 px-5 d-flex items-center justify-between py-3">
         <div class="inline-flex items-center">
           <NuxtLink
             href="/"
