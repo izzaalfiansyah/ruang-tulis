@@ -1,9 +1,21 @@
-<stype lang="scss">
+<style lang="scss">
 @use "./app.scss";
-</stype>
+</style>
+
+<script lang="ts" setup>
+import { useTheme } from "./store/useTheme";
+
+const theme = useTheme();
+
+onMounted(() => {
+  theme.init();
+
+  theme.media.addEventListener("change", theme.init);
+});
+</script>
 
 <template>
-  <div class="min-h-screen flex items-center justify-center">
-    <div class="text-5xl font-bold text-primary">Ruang Kita</div>
-  </div>
+  <NuxtLayout>
+    <NuxtPage></NuxtPage>
+  </NuxtLayout>
 </template>
