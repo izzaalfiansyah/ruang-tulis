@@ -49,7 +49,7 @@ onMounted(() => {
         <template v-if="!!documents.length" v-for="document in documents">
           <NuxtLink
             class="group p-3 rounded transition hover:bg-primary/10 block cursor-pointer"
-            :href="document.slug"
+            :href="`/doc/${document.id}`"
           >
             <div
               class="text-xl font-semibold font-tage group-hover:text-primary transition"

@@ -10,12 +10,12 @@ export class Document {
   title: string;
   description?: string;
   cover?: string;
+  icon?: string;
   date: Date;
   place: string;
   tags: string[];
   content: string;
   author?: User;
-  slug: string;
 
   static fromDocument(doc: DocumentSnapshot<DocumentData>): Document {
     const data = doc.data()!;
@@ -25,11 +25,11 @@ export class Document {
       title: data.title,
       description: data.description,
       cover: data.cover,
+      icon: data.icon,
       date: (data.date as Timestamp).toDate(),
       place: data.place,
       tags: data.tags,
       content: data.content,
-      slug: data.slug,
     };
   }
 }

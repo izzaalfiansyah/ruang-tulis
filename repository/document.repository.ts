@@ -1,14 +1,17 @@
 import {
   collection,
   doc,
+  DocumentReference,
   getDoc,
   getDocs,
   orderBy,
   query,
   where,
+  type DocumentData,
 } from "firebase/firestore";
 import { Document } from "~/entities/document.type";
 import type { Failure } from "~/entities/failure.type";
+import { User } from "~/entities/user.type";
 
 export class DocumentRepository {
   static async get(): Promise<Document[] | Failure> {
@@ -44,7 +47,20 @@ export class DocumentRepository {
         throw "Dokumen tidak ditemukan";
       }
 
-      return Document.fromDocument(result);
+      let document = Document.fromDocument(result);
+
+      const author = await getDoc(
+        result.data().author as DocumentReference<DocumentData>
+      );
+      console.log(author);
+
+      if (!author.exists()) {
+        throw "Author tidak ditemukan";
+      }
+
+      document.author = User.fromDocument(author);
+
+      return document;
     } catch (e: any) {
       return {
         code: 400,
