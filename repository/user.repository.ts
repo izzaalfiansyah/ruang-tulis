@@ -4,6 +4,7 @@ import {
   getDoc,
   getDocs,
   query,
+  setDoc,
   where,
 } from "firebase/firestore";
 import { User } from "~/entities/user.type";
@@ -43,5 +44,11 @@ export class UserRepository {
     }
 
     return user;
+  }
+
+  static async update(user: User): Promise<boolean> {
+    await setDoc(doc(db, "users", user.id), user);
+
+    return true;
   }
 }

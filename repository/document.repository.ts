@@ -22,6 +22,7 @@ export class DocumentRepository {
   static async get(props?: {
     tag?: string;
     search?: string;
+    authorId?: string;
   }): Promise<Document[]> {
     let filter: QueryConstraint[] = [];
 
@@ -34,6 +35,13 @@ export class DocumentRepository {
         ...filter,
         startAt(props.search),
         endAt(props.search + "\uf8ff"),
+      ];
+    }
+
+    if (props?.authorId) {
+      filter = [
+        ...filter,
+        where("author", "==", doc(db, "users", props.authorId)),
       ];
     }
 

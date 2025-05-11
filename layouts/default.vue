@@ -4,6 +4,7 @@ import {
   ArrowLeftEndOnRectangleIcon,
   PlusIcon,
 } from "@heroicons/vue/24/outline";
+import { UserCircleIcon } from "@heroicons/vue/24/solid";
 
 const auth = authStore();
 </script>
@@ -32,14 +33,19 @@ const auth = authStore();
         </NuxtLink>
 
         <template v-if="!!auth.user">
-          <NuxtLink
-            class="inline-flex items-center bg-primary px-5 py-1 rounded-full text-white text-sm uppercase font-semibold"
-            href="/doc/new"
-            v-if="$route.fullPath != '/doc/new'"
-          >
-            <PlusIcon class="mr-1.5 size-4"></PlusIcon>
-            Tulisan
-          </NuxtLink>
+          <div class="inline-flex space-x-6">
+            <NuxtLink
+              class="inline-flex items-center text-primary text-sm uppercase font-semibold"
+              href="/doc/new"
+              v-if="$route.fullPath != '/doc/new'"
+            >
+              <PlusIcon class="mr-1.5 size-4"></PlusIcon>
+              Tulisan
+            </NuxtLink>
+            <NuxtLink href="/profile" class="inline-flex items-center">
+              <UserCircleIcon class="size-5"></UserCircleIcon>
+            </NuxtLink>
+          </div>
         </template>
       </div>
     </div>

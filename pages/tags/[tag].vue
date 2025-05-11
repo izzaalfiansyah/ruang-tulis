@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import type { Document } from "~/entities/document.type";
 import { DocumentRepository } from "~/repository/document.repository";
+import { appStore } from "~/store/app.store";
 
 const tag: string = useRoute().params.tag.toString();
+const app = appStore();
 
 const documents = ref<Document[]>([]);
 const isLoading = ref(false);
@@ -24,11 +26,15 @@ async function getDocuments() {
 onMounted(() => {
   getDocuments();
 });
+
+app.seoMeta({
+  title: `Tag #${tag}`,
+});
 </script>
 
 <template>
   <div class="py-10 main-container">
-    <div class="text-4xl font-bold text-primary">🚀 #{{ tag }}</div>
+    <div class="text-4xl font-bold text-primary font-tage">🚀 #{{ tag }}</div>
     <div class="mt-10 min-h-[60vh]">
       <template v-if="isLoading">
         <div class="text-center">

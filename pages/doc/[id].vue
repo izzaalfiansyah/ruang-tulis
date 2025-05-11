@@ -16,6 +16,7 @@ import { authStore } from "~/store/auth.store";
 import EmojiPicker, { type EmojiExt } from "vue3-emoji-picker";
 import { themeStore } from "~/store/theme.store";
 import { appStore } from "~/store/app.store";
+import { showToast } from "~/utils/notification";
 
 const params = useRoute().params;
 const document = ref<Document>();
@@ -86,7 +87,8 @@ async function saveDocument() {
       useRouter().replace(`/doc/${documentId}`);
     }
   } catch (e) {
-    alert(parseError(e));
+    document.value!.id = null;
+    showToast(parseError(e));
   }
 
   isLoading.value = false;
@@ -100,7 +102,7 @@ async function deleteDocument() {
 
     useRouter().replace("/");
   } catch (e) {
-    alert(parseError(e));
+    showToast(parseError(e));
   }
 
   isLoading.value = false;
@@ -321,7 +323,12 @@ onMounted(() => {
             , {{ formatDate(document.date) }}
           </div>
           <template v-if="document.author">
-            by <a href="/" class="text-primary">{{ document.author?.name }}</a>
+            by
+            <NuxtLink
+              :href="`/profile/${document.author.id}`"
+              class="text-primary"
+              >{{ document.author.name }}</NuxtLink
+            >
           </template>
         </div>
         <div class="mt-10 pt-10 border-t">
