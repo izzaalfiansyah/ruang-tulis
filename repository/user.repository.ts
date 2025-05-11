@@ -1,3 +1,4 @@
+import { updatePassword } from "firebase/auth";
 import {
   collection,
   doc,
@@ -46,8 +47,12 @@ export class UserRepository {
     return user;
   }
 
-  static async save(user: User): Promise<boolean> {
+  static async save(user: User, password?: string): Promise<boolean> {
     await setDoc(doc(db, "users", user.id), user);
+
+    if (password) {
+      await updatePassword(auth.currentUser!, password);
+    }
 
     return true;
   }

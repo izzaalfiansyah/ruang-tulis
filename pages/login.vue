@@ -40,6 +40,17 @@ async function handleSubmit() {
   isLoading.value = false;
 }
 
+async function handleLoginByGoogle() {
+  try {
+    const result = await AuthRepository.loginByGoogle();
+
+    auth.setUser(result);
+    useRouter().replace("/");
+  } catch (e) {
+    // form.setError("email", parseError(e));
+  }
+}
+
 definePageMeta({
   middleware: ["guest-middleware"],
 });
@@ -76,6 +87,19 @@ appStore().seoMeta({
           :disabled="isLoading"
         >
           {{ isLoading ? "Memuat..." : "Masuk" }}
+        </button>
+        <button
+          type="button"
+          class="border w-full px-4 py-1 rounded mt-3 disabled:bg-gray-100 dark:disabled:bg-gray-800 inline-flex items-center justify-center"
+          :disabled="isLoading"
+          @click="handleLoginByGoogle"
+        >
+          <img
+            src="https://cdn4.iconfinder.com/data/icons/logos-brands-7/512/google_logo-google_icongoogle-512.png"
+            alt=""
+            class="inline size-4"
+          />
+          <span class="ml-2">Google</span>
         </button>
       </div>
       <div class="mt-10 text-sm text-center">

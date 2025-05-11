@@ -11,6 +11,10 @@ import { AuthRepository } from "~/repository/auth.repository";
 
 const auth = authStore();
 const user = ref<User | undefined>({ ...auth.user } as User);
+const password = ref({
+  password: "",
+  password_confirm: "",
+});
 const showLogoutModal = ref(false);
 
 watch(
@@ -32,20 +36,34 @@ form.setSchema(
       name: z.string().min(5),
       phone: z.string().min(8),
       bio: z.string().min(5).optional(),
+      password: z.string().min(8).optional(),
+      password_confirm: z
+        .string()
+        .min(8)
+        .optional()
+        .refine(
+          (value) => value === password.value.password,
+          "Password tidak sama"
+        ),
     })
     .required()
 );
 
 async function handleSubmit() {
-  if (form.validate(user.value!)) {
+  if (form.validate({ ...user.value!, ...password.value })) {
     try {
-      const result = await UserRepository.save(user.value!);
+      const result = await UserRepository.save(
+        user.value!,
+        password.value.password
+      );
 
       if (result) {
         auth.setUser(user.value!);
       }
 
       showToast("Berhasil mengedit profil", { isSuccess: true });
+      password.value.password = "";
+      password.value.password_confirm = "";
     } catch (e) {
       showToast(parseError(e));
     }
@@ -110,7 +128,26 @@ definePageMeta({
             {{ form.errors?.bio }}
           </div>
         </div>
-        <div class="flex items-center justify-between">
+        <div class="mb-3">
+          <div class="text-sm text-gray-500">Password</div>
+          <div class="text-xs text-gray-400 dark:text-gray-600 mb-1 italic">
+            (Isi jika ingin mengganti password anda.)
+          </div>
+          <TextField
+            type="password"
+            v-model="password.password"
+            placeholder="Masukkan Password"
+            :error="form.errors?.password"
+            class="mb-1"
+          ></TextField>
+          <TextField
+            type="password"
+            v-model="password.password_confirm"
+            placeholder="Masukkan Konfirmasi Password"
+            :error="form.errors?.password_confirm"
+          ></TextField>
+        </div>
+        <div class="flex items-center justify-between mt-10">
           <button
             class="bg-primary px-5 text-sm uppercase font-semibold text-white py-2 rounded"
             type="submit"
