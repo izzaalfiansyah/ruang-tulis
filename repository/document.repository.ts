@@ -3,11 +3,15 @@ import {
   deleteDoc,
   doc,
   DocumentReference,
+  endAt,
   getDoc,
   getDocs,
   orderBy,
   query,
+  QueryConstraint,
   setDoc,
+  startAt,
+  where,
   type DocumentData,
 } from "firebase/firestore";
 import { v4 } from "uuid";
@@ -15,9 +19,26 @@ import { Document } from "~/entities/document.type";
 import { User } from "~/entities/user.type";
 
 export class DocumentRepository {
-  static async get(): Promise<Document[]> {
+  static async get(props?: {
+    tag?: string;
+    search?: string;
+  }): Promise<Document[]> {
+    let filter: QueryConstraint[] = [];
+
+    if (props?.tag) {
+      filter = [...filter, where("tags", "array-contains", props.tag)];
+    }
+
+    if (props?.search) {
+      filter = [
+        ...filter,
+        startAt(props.search),
+        endAt(props.search + "\uf8ff"),
+      ];
+    }
+
     const result = await getDocs(
-      query(collection(db, "documents"), orderBy("date", "desc"))
+      query(collection(db, "documents"), orderBy("date", "desc"), ...filter)
     );
 
     if (result.empty) {

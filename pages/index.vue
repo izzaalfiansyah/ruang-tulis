@@ -7,6 +7,8 @@ const documents = ref<Document[]>([]);
 const errorException = ref<string>();
 const isLoading = ref(false);
 
+const search = ref("");
+
 async function getDocuments() {
   isLoading.value = true;
 
@@ -43,6 +45,7 @@ appStore().seoMeta();
         type="text"
         class="w-full bg-gray-50 dark:bg-gray-800 rounded px-3 py-2 outline-none focus:ring-2 focus:ring-primary transition"
         placeholder="Cari Tulisan..."
+        v-model="search"
       />
     </div>
     <div class="mt-10 pt-10 border-t">
@@ -56,7 +59,16 @@ appStore().seoMeta();
           <div class="text-center">{{ errorException }}</div>
         </template>
         <template v-else>
-          <template v-if="!!documents.length" v-for="document in documents">
+          <template
+            v-if="!!documents.length"
+            v-for="document in documents.filter(
+              (doc) =>
+                doc.title.toLowerCase().includes(search.toLowerCase()) ||
+                (doc.description ?? '')
+                  .toLowerCase()
+                  .includes(search.toLowerCase())
+            )"
+          >
             <DocumentItem :document="document"></DocumentItem>
           </template>
           <template v-else>
