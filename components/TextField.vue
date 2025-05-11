@@ -2,7 +2,7 @@
 import type { InputHTMLAttributes } from "vue";
 
 interface Props extends /* @vue-ignore */ InputHTMLAttributes {
-  modelValue: string;
+  modelValue?: string;
   error?: string;
 }
 

@@ -44,6 +44,6 @@ const auth = authStore();
       </div>
     </div>
     <slot></slot>
-    <Footer></Footer>
+    <Footer v-if="!$route.path.includes('doc')"></Footer>
   </div>
 </template>
