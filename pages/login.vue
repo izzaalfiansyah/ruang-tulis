@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import z from "zod";
 import type { User } from "~/entities/user.type";
-import { AuthRepository } from "~/repository/auth.repository";
+import { AuthRepository, type LoginParams } from "~/repository/auth.repository";
+import { appStore } from "~/store/app.store";
 import { authStore } from "~/store/auth.store";
 import { formStore } from "~/store/form.store";
 
@@ -16,13 +17,10 @@ form.setSchema(
       email: z.string().email(),
       password: z.string().min(8),
     })
-    .required({
-      email: true,
-      password: true,
-    })
+    .required()
 );
 
-const request = ref({
+const request = ref<LoginParams>({
   email: "",
   password: "",
 });
@@ -41,6 +39,14 @@ async function handleSubmit() {
   }
   isLoading.value = false;
 }
+
+definePageMeta({
+  middleware: ["guest-middleware"],
+});
+
+appStore().seoMeta({
+  title: "Login",
+});
 </script>
 
 <template>
@@ -71,6 +77,10 @@ async function handleSubmit() {
         >
           {{ isLoading ? "Memuat..." : "Masuk" }}
         </button>
+      </div>
+      <div class="mt-10 text-sm text-center">
+        Belum punya akun? register
+        <nuxt-link to="/register" class="text-primary">di sini</nuxt-link>
       </div>
     </form>
   </div>

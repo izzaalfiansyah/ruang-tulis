@@ -10,7 +10,7 @@ import {
 import { User } from "~/entities/user.type";
 
 export class UserRepository {
-  static async get(id: any): Promise<User> {
+  static async find(id: any): Promise<User> {
     const result = await getDoc(doc(db, "users", id));
 
     if (!result.exists()) {
@@ -46,7 +46,7 @@ export class UserRepository {
     return user;
   }
 
-  static async update(user: User): Promise<boolean> {
+  static async save(user: User): Promise<boolean> {
     await setDoc(doc(db, "users", user.id), user);
 
     return true;

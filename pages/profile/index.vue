@@ -6,9 +6,12 @@ import { formStore } from "~/store/form.store";
 import z from "zod";
 import { UserRepository } from "~/repository/user.repository";
 import { showToast } from "~/utils/notification";
+import { ArrowLeftStartOnRectangleIcon } from "@heroicons/vue/24/outline";
+import { AuthRepository } from "~/repository/auth.repository";
 
 const auth = authStore();
 const user = ref<User | undefined>({ ...auth.user } as User);
+const showLogoutModal = ref(false);
 
 watch(
   () => auth.user,
@@ -36,7 +39,7 @@ form.setSchema(
 async function handleSubmit() {
   if (form.validate(user.value!)) {
     try {
-      const result = await UserRepository.update(user.value!);
+      const result = await UserRepository.save(user.value!);
 
       if (result) {
         auth.setUser(user.value!);
@@ -48,6 +51,19 @@ async function handleSubmit() {
     }
   }
 }
+
+async function handleLogout() {
+  await AuthRepository.logout();
+
+  auth.setUser();
+  showLogoutModal.value = false;
+
+  useRouter().replace("/login");
+}
+
+definePageMeta({
+  middleware: ["auth-middleware"],
+});
 </script>
 
 <template>
@@ -88,17 +104,50 @@ async function handleSubmit() {
             class="w-full bg-transparent border focus:ring-2 focus:ring-primary transition outline-none p-3 rounded resize-none"
             :class="{ 'ring-2 ring-red-500': !!form.errors?.bio }"
             v-model="user.bio"
+            placeholder="Masukkan Bio"
           ></textarea>
           <div class="mt-1 text-sm text-red-500" v-if="form.errors?.bio">
             {{ form.errors?.bio }}
           </div>
         </div>
-        <button
-          class="bg-primary px-5 text-sm uppercase font-semibold text-white py-2 rounded"
-        >
-          Simpan Profil
-        </button>
+        <div class="flex items-center justify-between">
+          <button
+            class="bg-primary px-5 text-sm uppercase font-semibold text-white py-2 rounded"
+            type="submit"
+          >
+            Simpan Profil
+          </button>
+          <button
+            class="bg-red-500 px-5 text-sm uppercase font-semibold text-white py-2 rounded inline-flex items-center"
+            type="button"
+            @click="showLogoutModal = true"
+          >
+            <ArrowLeftStartOnRectangleIcon
+              class="mr-2 size-4"
+            ></ArrowLeftStartOnRectangleIcon>
+            Logout
+          </button>
+        </div>
       </form>
     </template>
   </div>
+
+  <Modal v-model="showLogoutModal">
+    <div class="p-5 rounded bg-background max-w-full w-[340px]">
+      <div class="text-sm text-gray-400 dark:text-gray-600">
+        Apakah anda yakin ingin logout?
+      </div>
+      <div class="flex justify-end mt-5 space-x-5">
+        <button @click="showLogoutModal = false" class="text-xs font-semibold">
+          BATAL
+        </button>
+        <button
+          @click="handleLogout"
+          class="text-xs font-semibold text-red-500"
+        >
+          LOGOUT
+        </button>
+      </div>
+    </div>
+  </Modal>
 </template>

@@ -17,7 +17,7 @@ async function getUser() {
   isLoading.value = true;
 
   try {
-    const result = await UserRepository.get(userId);
+    const result = await UserRepository.find(userId);
 
     user.value = result;
 

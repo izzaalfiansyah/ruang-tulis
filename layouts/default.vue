@@ -22,7 +22,7 @@ const auth = authStore();
           </NuxtLink>
         </div>
         <NuxtLink
-          v-if="!auth.user && $route.path != '/login'"
+          v-if="!auth.user && !['/login', '/register'].includes($route.path)"
           href="/login"
           class="inline-flex items-center"
         >

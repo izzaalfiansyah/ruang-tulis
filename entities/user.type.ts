@@ -13,11 +13,11 @@ export class User {
 
     return {
       id: doc.id,
-      email: data.email,
-      name: data.name,
-      phone: data.phone,
+      email: data.email ?? "",
+      name: data.name ?? "",
+      phone: data.phone ?? "",
       verified: data.verified ?? false,
-      bio: data.bio,
+      bio: data.bio ?? "",
     };
   }
 }

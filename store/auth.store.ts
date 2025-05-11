@@ -14,7 +14,7 @@ export const authStore = defineStore("auth", {
         if (!!user) this.setUser(user);
       }
     },
-    setUser(user: User) {
+    setUser(user?: User) {
       this.user = user;
     },
   },
