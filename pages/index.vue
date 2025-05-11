@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { Document } from "~/entities/document.type";
 import { DocumentRepository } from "~/repository/document.repository";
+import { appStore } from "~/store/app.store";
 
 const documents = ref<Document[]>([]);
 const errorException = ref<string>();
@@ -22,6 +23,8 @@ async function getDocuments() {
 onMounted(() => {
   getDocuments();
 });
+
+appStore().seoMeta();
 </script>
 
 <template>

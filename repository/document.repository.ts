@@ -1,13 +1,16 @@
 import {
   collection,
+  deleteDoc,
   doc,
   DocumentReference,
   getDoc,
   getDocs,
   orderBy,
   query,
+  setDoc,
   type DocumentData,
 } from "firebase/firestore";
+import { v4 } from "uuid";
 import { Document } from "~/entities/document.type";
 import { User } from "~/entities/user.type";
 
@@ -50,5 +53,24 @@ export class DocumentRepository {
     document.author = User.fromDocument(author);
 
     return document;
+  }
+
+  static async save(document: Document): Promise<any> {
+    const isCreate = !document.id;
+
+    if (isCreate) {
+      document.id = v4();
+    }
+
+    const author = doc(db, "users", document.author!.id);
+    await setDoc(doc(db, "documents", document.id), { ...document, author });
+
+    return document.id;
+  }
+
+  static async destroy(document: Document): Promise<boolean> {
+    await deleteDoc(doc(db, "documents", document.id));
+
+    return true;
   }
 }

@@ -33,7 +33,7 @@ const auth = authStore();
 
         <template v-if="!!auth.user">
           <NuxtLink
-            class="inline-flex items-center bg-primary px-5 py-1 rounded-full text-white"
+            class="inline-flex items-center bg-primary px-5 py-1 rounded-full text-white text-sm uppercase font-semibold"
             href="/doc/new"
             v-if="$route.fullPath != '/doc/new'"
           >

@@ -5,7 +5,9 @@ import {
   ArrowLongLeftIcon,
   ArrowUpTrayIcon,
   FaceSmileIcon,
+  PencilIcon,
   PhotoIcon,
+  ShareIcon,
   TrashIcon,
 } from "@heroicons/vue/24/outline";
 import type { Document } from "~/entities/document.type";
@@ -13,6 +15,7 @@ import { DocumentRepository } from "~/repository/document.repository";
 import { authStore } from "~/store/auth.store";
 import EmojiPicker, { type EmojiExt } from "vue3-emoji-picker";
 import { themeStore } from "~/store/theme.store";
+import { appStore } from "~/store/app.store";
 
 const params = useRoute().params;
 const document = ref<Document>();
@@ -22,10 +25,12 @@ const errorException = ref<string>();
 const showTagModal = ref<boolean>(false);
 const showIconModal = ref<boolean>(false);
 const showCoverModal = ref<boolean>(false);
+const showDeleteModal = ref<boolean>(false);
 const isCoverIsLink = ref<boolean>(false);
 
 const auth = authStore();
 const theme = themeStore();
+const app = appStore();
 
 async function getDocument() {
   isLoading.value = true;
@@ -38,7 +43,7 @@ async function getDocument() {
       isCoverIsLink.value = document.value.cover.startsWith("http");
 
       if (!isValidLink(document.value.cover)) {
-        document.value.cover = undefined;
+        document.value.cover = "";
       }
     }
   } catch (e) {
@@ -51,25 +56,6 @@ async function getDocument() {
 const isCanEdit = computed(
   () => auth.user?.id == document.value?.author?.id || params.id == "new"
 );
-
-onMounted(() => {
-  if (params.id == "new") {
-    document.value = {
-      title: "",
-      description: "",
-      content: "",
-      tags: [],
-      date: new Date(Date.now()),
-      place: "",
-      icon: "",
-      cover: "",
-      id: null,
-      author: auth.user,
-    };
-  } else {
-    getDocument();
-  }
-});
 
 const handleUploadCover = (e: Event) => {
   const files = (e.currentTarget as HTMLInputElement).files;
@@ -89,15 +75,91 @@ const handleUploadCover = (e: Event) => {
 };
 
 const fileInput = ref<HTMLInputElement>();
+
+async function saveDocument() {
+  isLoading.value = true;
+
+  try {
+    const documentId = await DocumentRepository.save(document.value!);
+
+    if (documentId != params.id) {
+      useRouter().replace(`/doc/${documentId}`);
+    }
+  } catch (e) {
+    alert(parseError(e));
+  }
+
+  isLoading.value = false;
+}
+
+async function deleteDocument() {
+  isLoading.value = true;
+
+  try {
+    await DocumentRepository.destroy(document.value!);
+
+    useRouter().replace("/");
+  } catch (e) {
+    alert(parseError(e));
+  }
+
+  isLoading.value = false;
+}
+
+function createNewDocument() {
+  document.value = {
+    title: "",
+    description: "",
+    content: "",
+    tags: [],
+    date: new Date(Date.now()),
+    place: "",
+    icon: "",
+    cover: "",
+    id: null,
+    author: auth.user,
+  };
+}
+
+function shareDocument() {
+  try {
+    navigator.share({
+      title: document.value?.title,
+      text: document.value?.description,
+      url: window.location.href,
+    });
+  } catch (e) {
+    //
+  }
+}
+
+watch(
+  () => auth.user,
+  () => {
+    if (params.id == "new") {
+      createNewDocument();
+    }
+  }
+);
+
+watch(document, () => {
+  app.seoMeta({
+    title: document.value?.id ? document.value?.title : "Tulisan Baru",
+    description: document.value?.description,
+  });
+});
+
+onMounted(() => {
+  if (params.id == "new") {
+    createNewDocument();
+  } else {
+    getDocument();
+  }
+});
 </script>
 
 <template>
-  <template v-if="isLoading">
-    <div class="text-center my-20">
-      <SpinLoader></SpinLoader>
-    </div>
-  </template>
-  <template v-else-if="errorException">
+  <template v-if="errorException">
     <div class="my-20 text-center">{{ errorException }}</div>
   </template>
   <template v-else>
@@ -115,7 +177,7 @@ const fileInput = ref<HTMLInputElement>();
           <div class="absolute right-5 bottom-5">
             <button
               class="size-8 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-800"
-              @click="document.cover = undefined"
+              @click="document.cover = ''"
             >
               <TrashIcon
                 class="size-5 text-gray-500 cursor-pointer"
@@ -206,26 +268,39 @@ const fileInput = ref<HTMLInputElement>();
         <div class="mt-2" v-else v-if="document.description">
           {{ document.description }}
         </div>
-        <div
-          class="mt-5 space-x-1.5"
-          :class="{ 'cursor-pointer inline-block': isCanEdit }"
-          @click="
-            () => {
-              if (isCanEdit) {
-                showTagModal = true;
-              }
-            }
-          "
-        >
+        <div class="mt-5 space-x-1.5">
           <template v-for="tag in document.tags">
-            <div class="inline-flex items-center">
+            <NuxtLink :href="`/tags/${tag}`" class="inline-flex items-center">
               <div class="text-sm text-primary bg-primary/10 rounded px-2 py-1">
                 #{{ tag }}
               </div>
+            </NuxtLink>
+          </template>
+          <template v-if="document.tags.length > 0 && isCanEdit">
+            <div
+              @click="
+                () => {
+                  if (isCanEdit) {
+                    showTagModal = true;
+                  }
+                }
+              "
+              class="rounded-full size-6 inline-flex items-center justify-center bg-gray-100 dark:bg-gray-800 cursor-pointer"
+            >
+              <PencilIcon class="size-3"></PencilIcon>
             </div>
           </template>
           <template v-if="isCanEdit && document.tags.length == 0">
-            <div class="text-gray-400 dark:text-gray-600 text-sm">
+            <div
+              class="text-gray-400 dark:text-gray-600 text-sm cursor-pointer"
+              @click="
+                () => {
+                  if (isCanEdit) {
+                    showTagModal = true;
+                  }
+                }
+              "
+            >
               Tidak ada tags
             </div>
           </template>
@@ -255,20 +330,43 @@ const fileInput = ref<HTMLInputElement>();
       </div>
     </template>
   </template>
-  <div class="mb-10 mt-5 main-container flex items-center justify-between">
+  <div class="pb-14 mt-5 main-container flex items-center justify-between">
     <NuxtLink
       to="/"
-      class="inline-flex items-center hover:text-primary transition"
+      class="inline-flex items-center hover:text-primary transition uppercase text-sm"
+      v-if="!isCanEdit"
     >
       <ArrowLongLeftIcon class="mr-1.5 size-4"></ArrowLongLeftIcon>
-      {{ params?.id == "new" ? "Kembali" : "Lainnya" }}
+      Lainnya
     </NuxtLink>
+    <div></div>
 
     <template v-if="!!document && isCanEdit">
-      <button class="inline-flex items-center hover:text-primary transition">
-        <ArrowUpTrayIcon class="mr-1.5 size-4"></ArrowUpTrayIcon>
-        Simpan
-      </button>
+      <div class="inline-flex items-center space-x-6">
+        <button
+          class="inline-flex items-center text-red-500 transition outline-none uppercase text-sm"
+          @click="showDeleteModal = true"
+          v-if="!!document.id"
+        >
+          <TrashIcon class="mr-1.5 size-4"></TrashIcon>
+          Hapus
+        </button>
+        <button
+          class="inline-flex items-center transition outline-none uppercase text-sm"
+          v-if="!!document.id"
+          @click="shareDocument"
+        >
+          <ShareIcon class="mr-1.5 size-4"></ShareIcon>
+          Share
+        </button>
+        <button
+          class="inline-flex items-center hover:text-primary transition outline-none uppercase text-sm"
+          @click="saveDocument"
+        >
+          <ArrowUpTrayIcon class="mr-1.5 size-4"></ArrowUpTrayIcon>
+          Simpan
+        </button>
+      </div>
     </template>
   </div>
 
@@ -317,7 +415,7 @@ const fileInput = ref<HTMLInputElement>();
     </div>
   </Modal>
 
-  <!-- <Modal v-model="showCoverModal">
+  <Modal v-model="showCoverModal">
     <div class="p-5 rounded bg-background max-w-full w-[340px]">
       <div class="mb-4 rounded border p-1 flex justify-stretch">
         <button
@@ -378,7 +476,7 @@ const fileInput = ref<HTMLInputElement>();
         <template v-if="document?.cover">
           <button
             class="text-primary text-xs font-semibold mr-5"
-            @click="document.cover = undefined"
+            @click="document.cover = ''"
           >
             HAPUS
           </button>
@@ -391,5 +489,32 @@ const fileInput = ref<HTMLInputElement>();
         </button>
       </div>
     </div>
-  </Modal> -->
+  </Modal>
+
+  <Modal v-model="isLoading">
+    <div class="p-5 rounded bg-background max-w-full w-[340px]">
+      <div class="text-center">
+        <SpinLoader></SpinLoader>
+      </div>
+    </div>
+  </Modal>
+
+  <Modal v-model="showDeleteModal">
+    <div class="p-5 rounded bg-background max-w-full w-[340px]">
+      <div class="text-sm text-gray-400 dark:text-gray-600">
+        Apakah anda yakin ingin menghapus tulisan ini?
+      </div>
+      <div class="flex justify-end mt-5 space-x-5">
+        <button @click="showDeleteModal = false" class="text-xs font-semibold">
+          BATAL
+        </button>
+        <button
+          @click="deleteDocument"
+          class="text-xs font-semibold text-red-500"
+        >
+          HAPUS
+        </button>
+      </div>
+    </div>
+  </Modal>
 </template>

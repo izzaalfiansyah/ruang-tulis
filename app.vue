@@ -3,12 +3,13 @@
 </style>
 
 <script lang="ts" setup>
-import { AuthRepository } from "./repository/auth.repository";
+import { appStore } from "./store/app.store";
 import { authStore } from "./store/auth.store";
 import { themeStore } from "./store/theme.store";
 
 const theme = themeStore();
 const auth = authStore();
+const app = appStore();
 
 onMounted(() => {
   theme.init();
@@ -16,6 +17,8 @@ onMounted(() => {
 
   theme.media.addEventListener("change", theme.init);
 });
+
+app.seoMeta();
 </script>
 
 <template>

@@ -10,7 +10,6 @@ export class AuthRepository {
       const user = await UserRepository.get(
         localStorage.getItem(AUTHSECRET("authid"))
       );
-      console.log(user);
 
       return user;
     } catch (e) {

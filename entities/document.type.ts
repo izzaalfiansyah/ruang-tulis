@@ -23,13 +23,13 @@ export class Document {
     return {
       id: doc.id,
       title: data.title,
-      description: data.description,
-      cover: data.cover,
-      icon: data.icon,
+      description: data.description ?? "",
+      cover: data.cover ?? "",
+      icon: data.icon ?? "",
       date: (data.date as Timestamp).toDate(),
-      place: data.place,
-      tags: data.tags,
-      content: data.content,
+      place: data.place ?? "",
+      tags: data.tags ?? [],
+      content: data.content ?? "",
     };
   }
 }
