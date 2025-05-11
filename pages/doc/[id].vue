@@ -6,6 +6,7 @@ import {
   ArrowUpTrayIcon,
   FaceSmileIcon,
   PhotoIcon,
+  TrashIcon,
 } from "@heroicons/vue/24/outline";
 import type { Document } from "~/entities/document.type";
 import { DocumentRepository } from "~/repository/document.repository";
@@ -21,7 +22,7 @@ const errorException = ref<string>();
 const showTagModal = ref<boolean>(false);
 const showIconModal = ref<boolean>(false);
 const showCoverModal = ref<boolean>(false);
-const isCoverIsLink = ref<boolean>(true);
+const isCoverIsLink = ref<boolean>(false);
 
 const auth = authStore();
 const theme = themeStore();
@@ -69,6 +70,25 @@ onMounted(() => {
     getDocument();
   }
 });
+
+const handleUploadCover = (e: Event) => {
+  const files = (e.currentTarget as HTMLInputElement).files;
+
+  if (files) {
+    const file = files[0];
+    if (!!file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (!!document.value) {
+          document.value.cover = reader.result as string;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+};
+
+const fileInput = ref<HTMLInputElement>();
 </script>
 
 <template>
@@ -83,19 +103,26 @@ onMounted(() => {
   <template v-else>
     <template v-if="!!document">
       <template v-if="document.cover">
-        <img
-          :src="document.cover"
-          :alt="document.title"
-          class="w-full object-cover h-44"
-          :class="{ 'cursor-pointer': isCanEdit }"
-          @click="
-            () => {
-              if (isCanEdit) {
-                showCoverModal = true;
-              }
-            }
-          "
-        />
+        <div class="relative">
+          <img
+            :src="document.cover"
+            :alt="document.title"
+            class="w-full object-cover h-44"
+            :class="{ 'cursor-pointer': isCanEdit }"
+            @click="fileInput?.click"
+          />
+
+          <div class="absolute right-5 bottom-5">
+            <button
+              class="size-8 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-800"
+              @click="document.cover = undefined"
+            >
+              <TrashIcon
+                class="size-5 text-gray-500 cursor-pointer"
+              ></TrashIcon>
+            </button>
+          </div>
+        </div>
       </template>
       <div class="main-container py-10">
         <div
@@ -137,19 +164,26 @@ onMounted(() => {
             <button
               type="button"
               class="font-semibold uppercase text-xs rounded bg-gray-200 dark:bg-gray-700 px-3 py-2 inline-flex items-center"
-              @click="
-                () => {
-                  if (isCanEdit) {
-                    showCoverModal = true;
-                  }
-                }
-              "
+              @click="fileInput?.click"
             >
               <PhotoIcon class="size-4 mr-2"></PhotoIcon>
               Pilih Cover
             </button>
           </template>
         </div>
+        <form>
+          <input
+            type="file"
+            accept="image/*"
+            ref="fileInput"
+            @change="handleUploadCover"
+            @click="
+              fileInput!.value = '';
+              fileInput!.files = null;
+            "
+            class="hidden"
+          />
+        </form>
         <div class="mt-4">
           <input
             type="text"
@@ -283,17 +317,9 @@ onMounted(() => {
     </div>
   </Modal>
 
-  <Modal v-model="showCoverModal">
+  <!-- <Modal v-model="showCoverModal">
     <div class="p-5 rounded bg-background max-w-full w-[340px]">
       <div class="mb-4 rounded border p-1 flex justify-stretch">
-        <button
-          type="button"
-          class="px-3 py-1 rounded grow text-center"
-          :class="{ 'bg-primary text-white': isCoverIsLink }"
-          @click="isCoverIsLink = true"
-        >
-          Link
-        </button>
         <button
           type="button"
           class="px-3 py-1 rounded grow text-center"
@@ -301,6 +327,14 @@ onMounted(() => {
           @click="isCoverIsLink = false"
         >
           Upload
+        </button>
+        <button
+          type="button"
+          class="px-3 py-1 rounded grow text-center"
+          :class="{ 'bg-primary text-white': isCoverIsLink }"
+          @click="isCoverIsLink = true"
+        >
+          Link
         </button>
       </div>
 
@@ -329,25 +363,22 @@ onMounted(() => {
       </template>
 
       <template v-else>
-        <div for="" class="text-sm mb-2">Pilih Gambar:</div>
-        <input
-          type="file"
-          class="w-full bg-transparent border rounded px-3 py-2 placeholder:text-gray-400 dark:placeholder:text-gray-600 file:bg-primary file:text-white file:rounded file:mr-2 file:border-none cursor-pointer outline-none"
-          accept="image/*"
-          @change="(e: Event) => {
-            console.log(e);
-          }"
-        />
+        <form action="">
+          <div for="" class="text-sm mb-2">Pilih Gambar:</div>
+          <input
+            type="file"
+            class="w-full bg-transparent border rounded px-3 py-2 placeholder:text-gray-400 dark:placeholder:text-gray-600 file:bg-primary file:text-white file:rounded file:mr-2 file:border-none cursor-pointer outline-none file:cursor-pointer"
+            accept="image/*"
+            @change="handleUploadCover"
+          />
+        </form>
       </template>
 
       <div class="flex justify-end mt-5">
         <template v-if="document?.cover">
           <button
-            class="text-primary text-xs font-semibold mr-2"
-            @click="
-              document.cover = undefined;
-              showCoverModal = false;
-            "
+            class="text-primary text-xs font-semibold mr-5"
+            @click="document.cover = undefined"
           >
             HAPUS
           </button>
@@ -360,5 +391,5 @@ onMounted(() => {
         </button>
       </div>
     </div>
-  </Modal>
+  </Modal> -->
 </template>

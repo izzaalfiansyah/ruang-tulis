@@ -35,10 +35,10 @@ function closeModal() {
     v-if="modelValue"
   >
     <div
-      class="fixed top-0 left-0 right-0 bottom-0 bg-black/30"
+      class="fixed top-0 left-0 right-0 bottom-0 bg-black/50"
       @click="closeModal"
     ></div>
-    <div @click.prevent="() => {}" class="modal-content relative">
+    <div class="modal-content relative">
       <slot></slot>
     </div>
   </div>
