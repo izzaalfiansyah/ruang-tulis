@@ -26,6 +26,7 @@ import Underline from "@tiptap/extension-underline";
 import Color from "@tiptap/extension-color";
 import TextStyle from "@tiptap/extension-text-style";
 import Highlight from "@tiptap/extension-highlight";
+import { followCursor } from "tippy.js";
 
 const props = defineProps<{
   modelValue: any;
@@ -69,7 +70,7 @@ const colors: {
 </script>
 
 <template>
-  <tempate v-if="editor && editable">
+  <template v-if="editor && editable">
     <div class="flex items-center justify-end mb-5">
       <div class="inline-flex items-center space-x-2">
         <EditorToggleButton
@@ -93,6 +94,7 @@ const colors: {
     <FloatingMenu
       :tippy-options="{
         duration: 100,
+        plugins: [followCursor],
         followCursor: true,
       }"
       :should-show="
@@ -236,6 +238,6 @@ const colors: {
         />
       </div>
     </FloatingMenu>
-  </tempate>
+  </template>
   <EditorContent :editor="editor"></EditorContent>
 </template>

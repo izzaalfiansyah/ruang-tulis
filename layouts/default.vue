@@ -1,6 +1,9 @@
 <script lang="ts" setup>
 import { authStore } from "~/store/auth.store";
-import { ArrowLeftEndOnRectangleIcon } from "@heroicons/vue/24/outline";
+import {
+  ArrowLeftEndOnRectangleIcon,
+  PlusIcon,
+} from "@heroicons/vue/24/outline";
 
 const auth = authStore();
 </script>
@@ -27,6 +30,17 @@ const auth = authStore();
           ></ArrowLeftEndOnRectangleIcon>
           Login
         </NuxtLink>
+
+        <template v-if="!!auth.user">
+          <NuxtLink
+            class="inline-flex items-center bg-primary px-5 py-1 rounded-full text-white"
+            href="/doc/new"
+            v-if="$route.fullPath != '/doc/new'"
+          >
+            <PlusIcon class="mr-1.5 size-4"></PlusIcon>
+            Tulisan
+          </NuxtLink>
+        </template>
       </div>
     </div>
     <slot></slot>

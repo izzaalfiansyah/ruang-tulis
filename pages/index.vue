@@ -1,21 +1,21 @@
 <script lang="ts" setup>
 import { Document } from "~/entities/document.type";
-import { Failure } from "~/entities/failure.type";
 import { DocumentRepository } from "~/repository/document.repository";
 
 const documents = ref<Document[]>([]);
-const errorException = ref<Failure | null>(null);
+const errorException = ref<string>();
 const isLoading = ref(false);
 
 async function getDocuments() {
   isLoading.value = true;
-  const result = await DocumentRepository.get();
 
-  if (result instanceof Failure) {
-    errorException.value = result;
+  try {
+    const result = await DocumentRepository.get();
+    documents.value = result as Document[];
+  } catch (e) {
+    errorException.value = parseError(e);
   }
 
-  documents.value = result as Document[];
   isLoading.value = false;
 }
 
@@ -44,28 +44,41 @@ onMounted(() => {
     </div>
     <div class="mt-10 pt-10 border-t">
       <div class="space-y-3">
-        <template v-if="!!documents.length" v-for="document in documents">
-          <NuxtLink
-            class="group p-3 rounded transition hover:bg-primary/10 block cursor-pointer"
-            :href="`/doc/${document.id}`"
-          >
-            <div
-              class="text-xl font-semibold font-tage group-hover:text-primary transition"
+        <template v-if="isLoading">
+          <div class="text-center">
+            <SpinLoader></SpinLoader>
+          </div>
+        </template>
+        <template v-else-if="errorException">
+          <div class="text-center">{{ errorException }}</div>
+        </template>
+        <template v-else>
+          <template v-if="!!documents.length" v-for="document in documents">
+            <NuxtLink
+              class="group p-3 rounded transition hover:bg-primary/10 block cursor-pointer"
+              :href="`/doc/${document.id}`"
             >
-              {{ document.title }}
-            </div>
-            <div class="text-sm text-gray-600 dark:text-gray-400 truncate">
-              {{ document.description }}
-            </div>
-
-            <div class="mt-5">
-              <div class="text-xs text-primary">
-                <!-- <div>Oleh: {{ document.author.name }}</div> -->
-                {{ document.place }},
-                {{ formatDate(document.date) }}
+              <div
+                class="text-xl font-semibold font-tage group-hover:text-primary transition"
+              >
+                {{ document.title }}
               </div>
-            </div>
-          </NuxtLink>
+              <div class="text-sm text-gray-600 dark:text-gray-400 truncate">
+                {{ document.description }}
+              </div>
+
+              <div class="mt-5">
+                <div class="text-xs text-primary">
+                  <!-- <div>Oleh: {{ document.author.name }}</div> -->
+                  {{ document.place }},
+                  {{ formatDate(document.date) }}
+                </div>
+              </div>
+            </NuxtLink>
+          </template>
+          <template v-else>
+            <div class="text-center">Tulisan belum tersedia</div>
+          </template>
         </template>
       </div>
     </div>
