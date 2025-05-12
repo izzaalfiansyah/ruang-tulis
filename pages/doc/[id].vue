@@ -54,8 +54,9 @@ async function getDocument() {
   isLoading.value = false;
 }
 
+const isCreateNew = computed(() => params.id == "new");
 const isCanEdit = computed(
-  () => auth.user?.id == document.value?.author?.id || params.id == "new"
+  () => auth.user?.id == document.value?.author?.id || isCreateNew.value
 );
 
 const handleUploadCover = (e: Event) => {
@@ -86,6 +87,10 @@ async function saveDocument() {
     if (documentId != params.id) {
       useRouter().replace(`/doc/${documentId}`);
     }
+
+    showToast("Berhasil menyimpan tulisan", {
+      isSuccess: true,
+    });
   } catch (e) {
     document.value!.id = null;
     showToast(parseError(e));
@@ -138,7 +143,7 @@ function shareDocument() {
 watch(
   () => auth.user,
   () => {
-    if (params.id == "new") {
+    if (isCreateNew.value) {
       createNewDocument();
     }
   }
@@ -152,7 +157,7 @@ watch(document, () => {
 });
 
 onMounted(() => {
-  if (params.id == "new") {
+  if (isCreateNew.value) {
     createNewDocument();
   } else {
     getDocument();
@@ -278,7 +283,10 @@ onMounted(() => {
         </div>
         <div class="mt-5 space-x-1.5">
           <template v-for="tag in document.tags">
-            <NuxtLink :href="`/tags/${tag}`" class="inline-flex items-center">
+            <NuxtLink
+              :href="isCreateNew ? 'javascript:void(0)' : `/tags/${tag}`"
+              class="inline-flex items-center"
+            >
               <div class="text-sm text-primary bg-primary/10 rounded px-2 py-1">
                 #{{ tag }}
               </div>
@@ -319,7 +327,7 @@ onMounted(() => {
               <input
                 type="text"
                 class="bg-transparent outline-none border-b"
-                placeholder="Tempat"
+                placeholder="Tempat Menulis"
                 v-model="document.place"
               />
             </template>
