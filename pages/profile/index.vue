@@ -30,27 +30,33 @@ appStore().seoMeta({
 
 const form = formStore();
 form.setSchema(
-  z
-    .object({
-      email: z.string().email(),
-      name: z.string().min(5),
-      phone: z.string().min(8),
-      bio: z.string().min(5).optional(),
-      password: z.string().min(8).optional(),
-      password_confirm: z
-        .string()
-        .min(8)
-        .optional()
-        .refine(
-          (value) => value === password.value.password,
-          "Password tidak sama"
-        ),
-    })
-    .required()
+  z.object({
+    email: z.string().email(),
+    name: z.string().min(5),
+    phone: z.string().min(8),
+    bio: z.string().min(5).nullable().optional(),
+    password: z.string().min(8).nullable().optional(),
+    password_confirm: z
+      .string()
+      .min(8)
+      .nullable()
+      .optional()
+      .refine(
+        (value) =>
+          password.value.password ? value == password.value.password : true,
+        "Password tidak sama"
+      ),
+  })
 );
 
 async function handleSubmit() {
-  if (form.validate({ ...user.value!, ...password.value })) {
+  let value: Record<string, any> = user.value as any;
+
+  if (password.value.password) {
+    value = { ...value, ...password.value };
+  }
+
+  if (form.validate(value)) {
     try {
       const result = await UserRepository.save(
         user.value!,
