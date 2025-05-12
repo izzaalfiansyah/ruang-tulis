@@ -94,14 +94,13 @@ const colors: {
     <FloatingMenu
       :tippy-options="{
         duration: 100,
-        plugins: [followCursor],
         followCursor: true,
       }"
       :should-show="
         ({ editor }) => editor.state.selection.from != editor.state.selection.to
       "
       :editor="editor"
-      class="-translate-y-[55%] -translate-x-20"
+      class="translate-y-[70%] -translate-x-20"
     >
       <div
         class="mb-5 space-x-2 inline-flex flex-wrap dark:bg-gray-800 bg-gray-100 px-3 py-2 rounded shadow"

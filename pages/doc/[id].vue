@@ -173,10 +173,16 @@ onMounted(() => {
             :alt="document.title"
             class="w-full object-cover h-44"
             :class="{ 'cursor-pointer': isCanEdit }"
-            @click="fileInput?.click"
+            @click="
+              () => {
+                if (isCanEdit) {
+                  fileInput?.click();
+                }
+              }
+            "
           />
 
-          <div class="absolute right-5 bottom-5">
+          <div class="absolute right-5 bottom-5" v-if="isCanEdit">
             <button
               class="size-8 rounded-full flex items-center justify-center bg-gray-100 dark:bg-gray-800"
               @click="document.cover = ''"
@@ -348,12 +354,12 @@ onMounted(() => {
     </NuxtLink>
     <div></div>
 
-    <template v-if="!!document && isCanEdit">
+    <template v-if="!!document">
       <div class="inline-flex items-center space-x-6">
         <button
           class="inline-flex items-center text-red-500 transition outline-none uppercase text-sm"
           @click="showDeleteModal = true"
-          v-if="!!document.id"
+          v-if="!!document.id && isCanEdit"
         >
           <TrashIcon class="mr-1.5 size-4"></TrashIcon>
           Hapus
@@ -369,6 +375,7 @@ onMounted(() => {
         <button
           class="inline-flex items-center hover:text-primary transition outline-none uppercase text-sm"
           @click="saveDocument"
+          v-if="isCanEdit"
         >
           <ArrowUpTrayIcon class="mr-1.5 size-4"></ArrowUpTrayIcon>
           Simpan

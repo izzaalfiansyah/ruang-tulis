@@ -7,6 +7,11 @@ body,
   @apply text-gray-800 dark:text-gray-100 bg-white dark:bg-gray-900 selection:bg-primary/50;
 }
 
+html,
+body {
+  @apply overflow-x-hidden;
+}
+
 * {
   font-family: "Inter", sans-serif;
   @apply border-gray-200 dark:border-gray-800;
