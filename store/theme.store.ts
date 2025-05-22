@@ -2,8 +2,7 @@ import type { Theme } from "~/entities/theme.type";
 
 export const themeStore = defineStore("theme", {
   state: () => {
-    let theme = localStorage.getItem("theme");
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    let theme = process.client ? localStorage.getItem("theme") : "system";
 
     if (!["system", "light", "dark"].includes(theme as string)) {
       theme = "system";
@@ -11,15 +10,12 @@ export const themeStore = defineStore("theme", {
 
     return {
       theme: theme as Theme,
-      media,
     };
   },
   actions: {
-    init() {
-      let isDark = this.theme == "dark";
-
-      if (this.theme == "system") {
-        isDark = this.media.matches;
+    init(isDark?: boolean) {
+      if (isDark == null) {
+        isDark = this.theme == "dark";
       }
 
       if (isDark) {
@@ -30,7 +26,10 @@ export const themeStore = defineStore("theme", {
     },
     set(theme: Theme) {
       this.theme = theme;
-      localStorage.setItem("theme", theme);
+
+      if (process.client) {
+        localStorage.setItem("theme", theme);
+      }
 
       this.init();
     },

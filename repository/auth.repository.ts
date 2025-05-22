@@ -23,12 +23,16 @@ export interface RegisterParams {
 }
 
 export class AuthRepository {
+  static secret = AUTHSECRET("authid");
+
   static getToken() {
-    return localStorage.getItem(AUTHSECRET("authid"));
+    return process.client ? localStorage.getItem(AUTHSECRET("authid")) : "";
   }
 
   static setToken(token: string) {
-    localStorage.setItem(AUTHSECRET("authid"), token);
+    return process.client
+      ? localStorage.setItem(AUTHSECRET("authid"), token)
+      : "";
   }
 
   static async init(): Promise<User> {
@@ -105,7 +109,10 @@ export class AuthRepository {
 
   static async logout(): Promise<boolean> {
     await auth.signOut();
-    localStorage.removeItem(AUTHSECRET("authid"));
+
+    if (process.client) {
+      localStorage.removeItem(AUTHSECRET("authid"));
+    }
 
     return true;
   }

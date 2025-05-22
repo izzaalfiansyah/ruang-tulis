@@ -12,10 +12,17 @@ const auth = authStore();
 const app = appStore();
 
 onMounted(() => {
-  theme.init();
-  auth.init();
+  if (process.client) {
+    theme.init();
+    auth.init();
 
-  theme.media.addEventListener("change", theme.init);
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    theme.init(media.matches);
+
+    media.addEventListener("change", () => {
+      theme.init(media.matches);
+    });
+  }
 });
 
 app.seoMeta();
