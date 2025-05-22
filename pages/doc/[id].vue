@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import "vue3-emoji-picker/css";
-
 import {
   ArrowLongLeftIcon,
   ArrowUpTrayIcon,
@@ -13,7 +11,6 @@ import {
 import type { Document } from "~/entities/document.type";
 import { DocumentRepository } from "~/repository/document.repository";
 import { authStore } from "~/store/auth.store";
-import EmojiPicker, { type EmojiExt } from "vue3-emoji-picker";
 import { themeStore } from "~/store/theme.store";
 import { appStore } from "~/store/app.store";
 import { showToast } from "~/utils/notification";
@@ -424,16 +421,18 @@ onMounted(() => {
 
   <Modal v-model="showIconModal">
     <div class="max-w-full w-[340px]">
-      <EmojiPicker
-        :native="true"
-        :theme="(theme.theme == 'system' ? 'auto' : theme.theme as any)"
-        @select="(e: EmojiExt) => {
-          if (!!document) {
-            document.icon = e.i;
-            showIconModal = false;
-          }
-        }"
-      ></EmojiPicker>
+      <ClientOnly>
+        <EmoPicker
+          @select="
+            (e: any) => {
+              if (!!document) {
+                document.icon = e.i;
+                showIconModal = false;
+              }
+            }
+          "
+        ></EmoPicker>
+      </ClientOnly>
     </div>
   </Modal>
 
